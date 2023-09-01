@@ -70,3 +70,12 @@ echo
 
 echo "### Stopping Compose ..."
 docker compose down
+
+echo "### Trying to create cron job for auto renewal"
+if crontab -l | grep -q "docker compose -f $(pwd)/docker-compose.yml run --rm --entrypoint 'certbot renew' certbot"; then
+  echo "Cron job for certificate renewal already exists."
+else
+  # Add the cron job for certificate renewal
+  (crontab -l 2>/dev/null; echo "0 0 */60 * * docker compose -f $(pwd)/docker-compose.yml run --rm --entrypoint 'certbot renew' certbot") | crontab -
+  echo "Cron job for certificate renewal added."
+fi
