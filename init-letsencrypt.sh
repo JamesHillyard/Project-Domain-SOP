@@ -1,9 +1,10 @@
 #!/bin/bash
 
-domains=(jamestest.payara.fish)
+domains=(jamestest.payara.fish) # Space separated list of domains to certify against
+email="" # Adding a valid address is strongly recommended
+
 rsa_key_size=4096
 data_path="./certbot"
-email="" # Adding a valid address is strongly recommended
 staging=0 # Set to 1 if you're testing your setup to avoid hitting request limits
 
 if [ -d "$data_path" ]; then
@@ -12,6 +13,8 @@ if [ -d "$data_path" ]; then
     exit
   fi
 fi
+
+rm -r $data_path
 
 echo "### Creating dummy certificate for $domains ..."
 path="/etc/letsencrypt/live/$domains"
@@ -33,8 +36,8 @@ echo
 
 echo "### Deleting dummy certificate for $domains ..."
 docker compose run --rm --entrypoint "\
-  rm -Rf /etc/letsencrypt/live/$domains* && \
-  rm -Rf /etc/letsencrypt/archive/$domains* && \
+  rm -Rf /etc/letsencrypt/live/$domains && \
+  rm -Rf /etc/letsencrypt/archive/$domains && \
   rm -Rf /etc/letsencrypt/renewal/$domains.conf" certbot
 echo
 
