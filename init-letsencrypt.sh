@@ -1,7 +1,7 @@
 #!/bin/bash
 
 domains=(example.payara.fish) # Space separated list of domains to certify against
-email="" # Adding a valid address is strongly recommended
+email="it.operations@payara.fish"
 
 rsa_key_size=4096
 data_path="./certbot"
