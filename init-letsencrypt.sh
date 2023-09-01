@@ -1,6 +1,6 @@
 #!/bin/bash
 
-domains=(jamestest.payara.fish) # Space separated list of domains to certify against
+domains=(example.payara.fish) # Space separated list of domains to certify against
 email="" # Adding a valid address is strongly recommended
 
 rsa_key_size=4096
