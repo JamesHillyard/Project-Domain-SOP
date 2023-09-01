@@ -53,7 +53,7 @@ done
 # Select appropriate email arg
 case "$email" in
   "") email_arg="--register-unsafely-without-email" ;;
-  *) email_arg="--email $email" ;;
+  *) email_arg="--no-eff-email --email $email" ;;
 esac
 
 # Enable staging mode if needed
