@@ -1,11 +1,12 @@
 #!/bin/bash
 
-domains=(example.payara.fish) # Space separated list of domains to certify against
 email="it.operations@payara.fish"
-
 rsa_key_size=4096
 data_path="./certbot"
 staging=0 # Set to 1 if you're testing your setup to avoid hitting request limits
+
+# Prompt the user for domains
+read -p "Enter domain name (Eg. example.payara.fish): " domains
 
 if [ -d "$data_path" ]; then
   read -p "Existing data found for $domains. Continue and replace existing certificate? (y/N) " decision
