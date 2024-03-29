@@ -73,10 +73,20 @@ echo "### Stopping Compose ..."
 docker compose down
 
 echo "### Trying to create cron job for auto renewal"
+# Check for the certificate renewal cron job
 if crontab -l | grep -q "docker compose -f $(pwd)/docker-compose.yml run --rm --entrypoint 'certbot renew' certbot"; then
   echo "Cron job for certificate renewal already exists."
 else
   # Add the cron job for certificate renewal
-  (crontab -l 2>/dev/null; echo "0 0 */60 * * docker compose -f $(pwd)/docker-compose.yml run --rm --entrypoint 'certbot renew' certbot") | crontab -
+  (crontab -l 2>/dev/null; echo "0 9 * * * docker compose -f $(pwd)/docker-compose.yml run --rm --entrypoint 'certbot renew' certbot") | crontab -
   echo "Cron job for certificate renewal added."
+fi
+
+# Check for the nginx reload cron job
+if crontab -l | grep -q "docker compose -f $(pwd)/docker-compose.yml exec nginx nginx -s reload"; then
+  echo "Cron job for nginx reload already exists."
+else
+  # Add the cron job for nginx reload
+  (crontab -l 2>/dev/null; echo "5 9 * * * docker compose -f $(pwd)/docker-compose.yml exec nginx nginx -s reload") | crontab -
+  echo "Cron job for nginx reload added."
 fi
