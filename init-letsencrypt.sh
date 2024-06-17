@@ -6,10 +6,10 @@ data_path="./certbot"
 staging=0 # Set to 1 if you're testing your setup to avoid hitting request limits
 
 # Prompt the user for domains
-read -p "Enter domain name (Eg. example.payara.fish): " domains
+read -p "Enter domain names (space-separated with the domain name in the ssl_certificate entry in nginx.conf first): " -a domains
 
 if [ -d "$data_path" ]; then
-  read -p "Existing data found for $domains. Continue and replace existing certificate? (y/N) " decision
+  read -p "Existing data found for ${domains[*]}. Continue and replace existing certificate? (y/N) " decision
   if [ "$decision" != "Y" ] && [ "$decision" != "y" ]; then
     exit
   fi
@@ -17,9 +17,9 @@ fi
 
 rm -r $data_path
 
-echo "### Creating dummy certificate for $domains ..."
-path="/etc/letsencrypt/live/$domains"
-mkdir -p "$data_path/conf/live/$domains"
+echo "### Creating dummy certificate for ${domains[*]} ..."
+path="/etc/letsencrypt/live/${domains[0]}"
+mkdir -p "$data_path/conf/live/${domains[0]}"
 docker compose run --rm --entrypoint "\
   mkdir -p '$path' && \
   touch '$path/privkey.pem'" certbot
@@ -35,16 +35,18 @@ echo "### Starting nginx ..."
 docker compose up --force-recreate -d nginx
 echo
 
-echo "### Deleting dummy certificate for $domains ..."
+docker ps
+
+echo "### Deleting dummy certificate for ${domains[*]} ..."
 docker compose run --rm --entrypoint "\
-  rm -Rf /etc/letsencrypt/live/$domains && \
-  rm -Rf /etc/letsencrypt/archive/$domains && \
-  rm -Rf /etc/letsencrypt/renewal/$domains.conf" certbot
+  rm -Rf /etc/letsencrypt/live/${domains[0]} && \
+  rm -Rf /etc/letsencrypt/archive/${domains[0]} && \
+  rm -Rf /etc/letsencrypt/renewal/${domains[0]}.conf" certbot
 echo
 
 
-echo "### Requesting Let's Encrypt certificate for $domains ..."
-#Join $domains to -d args
+echo "### Requesting Let's Encrypt certificate for ${domains[*]} ..."
+# Join each of the domains to -d args
 domain_args=""
 for domain in "${domains[@]}"; do
   domain_args="$domain_args -d $domain"
